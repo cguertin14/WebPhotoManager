@@ -1,0 +1,166 @@
+﻿@{
+    ViewBag.Title = "Home Page";
+}
+
+<div id="LoginDialog"></div>
+<div id="CreateAccountDialog"></div>
+
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(
+            function () {
+                $("#CreateAccount").click(function () { LoadCreateAccountDialog(); });
+                $("#Login").click(function () { LoadLoginDialog(); });
+                jQuery.ajaxSetup({ async: false });
+            })
+
+
+        var UserNameExist = false;
+        var UserNameNotExist = false;
+        var PasswordMatch = false;
+
+        function CheckUserNameNotExist() {
+            UserNameNotExist = false;
+            $.ajax({
+                url: "@Url.Action("UserNameExist", "Accounts")",
+                type: "GET",
+                async: false,
+                data: { username: $("#UserName").val() }
+            }).done(function (data) { UserNameNotExist = !data.UserNameExist; });
+            return UserNameNotExist;
+        }
+
+        function CheckUserNameExist() {
+            UserNameExist = false;
+            $.ajax({
+                url: "@Url.Action("UserNameExist", "Accounts")",
+                type: "GET",
+                async: false,
+                data: { username: $("#UserName").val() }
+            }).done(function (data) {  UserNameExist = data.UserNameExist; });
+            return UserNameExist;
+        }
+
+        function CheckPasswordMatch() {
+            PasswordMatch = false;
+            $.ajax({
+                url: "@Url.Action("PasswordMatch", "Accounts")",
+                type: "GET",
+                async: false,
+                data: { username: $("#UserName").val(), password: $("#Password").val() }
+            }).done(function (data) { PasswordMatch = data.PasswordMatch; })
+            return PasswordMatch;
+        }
+
+        function LoadCreateAccountDialog(id)
+        {
+            $.ajax({
+                url: "@Url.Action("Create","Accounts")",
+                type: "GET"
+            }).done(
+                function (partialViewResult) {
+                    $("#CreateAccountDialog").html(partialViewResult);
+                    var form = GetForm("#CreateAccountDialog");
+                    $.validator.addMethod("AjaxCheckNotExist", function () { return CheckUserNameNotExist(); }, "Existe déjà!");
+                    $("#CreateAccountDialog").dialog({
+                        modal: true,
+                        open: function (event, ui) {
+                            $('#CreateAccountDialog').css('overflow', 'hidden');
+                        },
+                        resizable: false,
+                        width: 500,
+                        height: 400,
+                        title: 'Création de compte',
+                        buttons: [
+                            {
+                                text: 'Créer',
+                                class: 'btn-primary',
+                                style: 'width:80px',
+                                click: function () {
+                                    if (form.valid()) {
+                                        $.ajax({
+                                            url: "@Url.Action("Create","Accounts")",
+                                            type: "POST",
+                                            data: form.serialize(),
+                                            success: function (data) {
+                                                if (data.status) {
+                                                    $("#CreateAccountDialog").dialog('close');
+                                                    $("#CreateAccountDialog").html("");
+                                                }
+                                            }
+                                        })
+                                    }
+                                }
+                            },
+                            {
+                                text: 'Annuler',
+                                style: 'width:80px',
+                                click: function () {
+                                    $("#CreateAccountDialog").dialog('close');
+                                    $("#CreateAccountDialog").html("");
+                                }
+                            }
+                        ]
+                    })
+                });
+        }
+
+       function LoadLoginDialog(id)
+        {
+            $.ajax({
+                url: "@Url.Action("Login","Accounts")",
+                type: "GET"
+            }).done(
+                function (partialViewResult) {
+                    $("#LoginDialog").html(partialViewResult);
+                    var form = GetForm("#LoginDialog");
+                    $.validator.addMethod("AjaxCheckExist", function () { return CheckUserNameExist(); }, "N'existe pas!");
+                    $.validator.addMethod("AjaxPasswordMatch", function () { return CheckPasswordMatch(); }, "Incorrect!");
+
+                    $("#LoginDialog").dialog({
+                        modal: true,
+                        open: function (event, ui) {
+                            $('#LoginDialog').css('overflow', 'hidden');
+                        },
+                        resizable: false,
+                        width: 500,
+                        height: 300,
+                        title: 'Login',
+                        buttons: [
+                            {
+                                text: 'Login',
+                                class: 'btn-primary',
+                                style: 'width:80px',
+                                click: function () {
+                                    if (form.valid()){
+                                        $.ajax({
+                                            url: "@Url.Action("Login","Accounts")",
+                                            type: "POST",
+                                            data: form.serialize(),
+                                            success: function (data) {
+                                                if (data.log) {
+                                                    $("#LoginDialog").dialog('close')
+                                                    $("#LoginDialog").html("");
+                                                }
+                                                document.location = "@Url.Action("Index","Photos")";
+                                            }
+                                        })
+                                    }
+                                }
+                            },
+                            {
+                                text: 'Annuler',
+                                style: 'width:80px',
+                                click: function () {
+                                    $("#LoginDialog").dialog('close');
+                                    $("#LoginDialog").html("");
+                                }
+                            }
+                        ]
+                    })
+                });
+        }
+
+    </script>
+}

@@ -1,0 +1,406 @@
+﻿
+@{
+    ViewBag.Title = "Index";
+}
+<table style="width:100%">
+    <tr>
+        <td><h2>Galerie de photos</h2></td>
+        <td style="text-align:right">
+            <img src="@Url.Content("~/Content/UI_Images/Add.png")" 
+                 id="AddPhoto" 
+                 class="Icon" 
+                 data-toggle="tooltip" 
+                 title="Nouvelle photo"/>
+        </td>
+    </tr>
+</table>
+<hr />
+<!--
+    TODO 
+    Insérer l'interface nécessaire pour les critères de recherche par dates et mots-clés
+-->
+<div id="GalleryPanel">
+    <table style="width:100%">
+        <tr>
+            <td style="width:5%" ; text-align:left> 
+                <img src="~/Content/UI_Images/Start.png" 
+                     class="IconBig" 
+                     id="FirstPhoto" 
+                     data-toggle="tooltip" title="Première photo"/> 
+            </td>
+            <td style="width:90%" id="thumbNailsPanel" rowspan="2"> </td>
+            <td style="width:5%; text-align:right">  
+                <img src="~/Content/UI_Images/Previous.png" 
+                     class="IconBig" id="NextPhoto" 
+                     data-toggle="tooltip" 
+                     title="Photo précédente"/> 
+            </td>
+        </tr>
+        <tr>
+            <td style="width:5%; text-align:left"> 
+                <img src="~/Content/UI_Images/End.png" 
+                     class="IconBig" id="LastPhoto" 
+                     data-toggle="tooltip" 
+                     title="Dernière photo"/> 
+            </td>
+            <td style="width:5%; text-align:right">  
+                <img src="~/Content/UI_Images/Next.png" 
+                     class="IconBig" id="PreviousPhoto" 
+                     data-toggle="tooltip" 
+                     title="Photo suivante"/> 
+            </td>
+        </tr>
+        <tr>
+            <td colspan="3">
+                <table style="width:100%">
+                    <tr>
+                        <td><h2 id="Title"></h2></td>
+                        <td style="text-align:right"><h3 id="Date"></h3></td>
+                        <td style="width:5%; text-align:right">
+                            <img src="@Url.Content("~/Content/UI_Images/Edit.png")" 
+                                 id="EditPhoto" 
+                                 class="Icon" 
+                                 data-toggle="tooltip" 
+                                 title=""/>
+                        </td>
+                        <td style="width:5%; text-align:right">
+                            <img src="@Url.Content("~/Content/UI_Images/Delete.png")" 
+                                 id="DeletePhoto" 
+                                 class="Icon"  
+                                 data-toggle="tooltip" 
+                                 title=""/>
+                        </td>
+                    </tr>
+                </table>
+                <img src="" id="CurrentPhoto" />
+                <div id="Description" style="font-size:x-large"></div>
+            </td>
+        </tr>
+    </table>
+</div>
+<div id="EditPhotoDialog"></div>
+<style>
+    .thumbNail > img {
+        height: 75px;
+        width: 100px;
+        float: left;
+        background-color: #808080;
+        margin: 25px;
+        margin-right: 0px;
+        border-radius: 8px;
+    }
+
+    #thumbNailsPanel {
+        margin: auto;
+        border-radius: 10px;
+    }
+
+    #CurrentPhoto {
+        width: 100%;
+        margin: auto;
+        z-index: 2000;
+        text-align: center;
+        border-radius: 12px;
+    }
+</style>
+@section Scripts {
+    @Scripts.Render("~/bundles/jqueryval")
+    <script>
+        $(document).ready(
+            function () {
+                GetPhotos();
+                $("#AddPhoto").click(
+                    function () {
+                        LoadEditPhotoDialog(0);
+                    })
+                $("#EditPhoto").click(
+                    function () {
+                        var id = photos[$(this).attr("alt")].Id;
+                        LoadEditPhotoDialog(id);
+                    })
+               $("#EditPhoto").hide();
+               $("#DeletePhoto").hide();
+               $("#FirstPhoto").click(
+                     function () {
+                         FirstPhoto();
+                     })
+                $("#LastPhoto").click(
+                     function () {
+                         LastPhoto();
+                     })
+                $("#NextPhoto").click(
+                      function () {
+                          NextPhoto();
+                      })
+                $("#PreviousPhoto").click(
+                     function () {
+                         PreviousPhoto();
+                     })
+            })
+
+
+        var photos = [];
+        var indexPhoto = -1;
+        var indexThumbnail = 0;
+        var NbThumbNails = 8;
+
+        function GetPhotos() {
+            $.ajax({
+                url: "@Url.Action("GetPhotos","Photos")",
+                type: "GET",
+                async: false
+            }).done(
+                function (data) {
+                    photos = data;
+                    if (photos.length < NbThumbNails) {
+                        $("#PreviousPhoto").hide();
+                        $("#NextPhoto").hide();
+                        $("#FirstPhoto").hide();
+                        $("#LastPhoto").hide();
+                    }
+                    else {
+                        $("#PreviousPhoto").show();
+                        $("#NextPhoto").show();
+                        $("#FirstPhoto").show();
+                        $("#LastPhoto").show();
+                    }
+                    InstallThumbNails();
+                })
+        }
+
+        function UpdateInfo() {
+            var Date = document.getElementById("Date");
+            Date.innerHTML = photos[indexPhoto].ShootDate;
+            var Title = document.getElementById("Title");
+            Title.innerHTML = photos[indexPhoto].Title;
+            var Description = document.getElementById("Description");
+            Description.innerHTML = photos[indexPhoto].Description;
+
+            $("#EditPhoto").attr("alt", indexPhoto);
+            $("#EditPhoto").attr("title", "Modifier la photo: " + photos[indexPhoto].Title);
+            $("#DeletePhoto").attr("alt", indexPhoto);
+            $("#DeletePhoto").attr("title", "Effacer la photo: " + photos[indexPhoto].Title);
+            $("#EditPhoto").show();
+            $("#DeletePhoto").show();
+        }
+
+        function EraseInfo() {
+            var Date = document.getElementById("Date");
+            Date.innerHTML = "";
+            var Title = document.getElementById("Title");
+            Title.innerHTML = "";
+            var Description = document.getElementById("Description");
+            Description.innerHTML = "";
+            $("#EditPhoto").hide();
+            $("#DeletePhoto").hide();
+        }
+
+        function UpdatePhoto() {
+           var img = document.getElementById("CurrentPhoto");
+           if (indexPhoto >= 0) {
+
+                $(img).animate({ opacity: "-=0" }, 200, function () {
+                    img.src = photos[indexPhoto].Source;
+                    img.style.opacity = 0;
+                    $(img).animate({ opacity: "+=1" }, 800, UpdateInfo())
+                });
+            }
+            else {
+               img.src = "";
+               EraseInfo();
+            }
+         }
+
+        function setImage(thumbNail) {
+
+            indexPhoto = thumbNail.alt;
+            UpdatePhoto();
+        }
+
+        function FirstPhoto() {
+            indexPhoto = 0;
+            indexThumbnail = 0;
+            InstallThumbNails();
+            UpdatePhoto();
+        }
+
+        function LastPhoto() {
+            indexPhoto = photos.length - 1;
+            indexThumbnail = indexPhoto - NbThumbNails + 1;
+            if (indexThumbnail < 0)
+                indexThumbnail = 0;
+            InstallThumbNails();
+            UpdatePhoto();
+        }
+
+        function NextPhoto() {
+            var thumbNailsPanel = document.getElementById("thumbNailsPanel");
+            thumbNailsPanel.removeChild(thumbNailsPanel.lastChild);
+            $(thumbNailsPanel.firstChild).animate({
+                marginLeft: "+=100px"
+            }, 400, function () {
+                indexThumbnail--;
+                if (indexThumbnail <= 0)
+                    indexThumbnail = photos.length - 1;
+                InstallThumbNails();
+            });
+        }
+
+        function PreviousPhoto() {
+            var thumbNailsPanel = document.getElementById("thumbNailsPanel");
+            thumbNailsPanel.removeChild(thumbNailsPanel.firstChild);
+            thumbNailsPanel.firstChild.style.marginLeft = "100px";
+            $(thumbNailsPanel.firstChild).animate({
+                marginLeft: "-=100px"
+            }, 400, function () {
+                indexThumbnail++;
+                if (indexThumbnail >= photos.length - 1)
+                    indexThumbnail = 0;
+                InstallThumbNails();
+            });
+        }
+
+        var widthChange = 40;
+        var heightChange = 30;
+        var marginChange = 20;
+
+        function GrowCallBackPhoto(evt) {
+            $(evt.target).animate({
+                width: "+=" + widthChange + "px",
+                height: "+=" + heightChange + "px",
+                margin: "-=" + marginChange + "px"
+            }, 300, '')
+
+        }
+
+        function ReduceCallBackPhoto(evt) {
+            $(evt.target).animate({
+                width: "-=" + widthChange + "px",
+                height: "-=" + heightChange + "px",
+                margin: "+=" + marginChange + "px"
+            }, 300, '')
+        }
+
+        function CreateThumbNail(photo, index) {
+            var thumbNail = document.createElement("div");
+            thumbNail.className = "thumbNail";
+            thumbNailsPanel.appendChild(thumbNail);
+            var img = document.createElement("img");
+            img.src = photo.Source;
+            thumbNail.appendChild(img);
+            thumbNail.alt = index;
+            thumbNail.onclick = function () { setImage(this); };
+            return thumbNail;
+        }
+
+        function InstallThumbNails() {
+            var thumbNailsPanel = document.getElementById("thumbNailsPanel");
+
+            while (thumbNailsPanel.firstChild) {
+                thumbNailsPanel.removeChild(thumbNailsPanel.firstChild);
+            }
+            var it = indexThumbnail;
+            var nt = (NbThumbNails > photos.length ? photos.length : NbThumbNails);
+            for (i = 0; i < nt; i++) {
+                if (it < photos.length) {
+                    var thumbNail = CreateThumbNail(photos[it], it);
+                    it++;
+                    if (it >= photos.length)
+                        it = 0;
+                }
+            }
+
+            var TA_Collection = document.getElementsByClassName("thumbNail");
+            for (i = 0; i < TA_Collection.length; i++) {
+                TA_Collection[i].onmouseover = GrowCallBackPhoto;
+                TA_Collection[i].onmouseout = ReduceCallBackPhoto;
+            }
+        }
+
+        function CheckPhoto(existCheck) {
+            if (existCheck)
+                return $("#ImageUploader").get(0).files.length > 0;
+            else
+                return true;
+        }
+
+        function CheckPhotoSize() {
+            var files = $("#ImageUploader").get(0).files;
+            if (files.length > 0)
+                return (files[0].size < 6000000);
+            else
+                return true;
+        }
+
+        function LoadEditPhotoDialog(id) {
+            $.ajax({
+                url: "@Url.Action("Edit","Photos")" + (id == 0? "":"/" + id),
+                type: "GET"
+            }).done(
+            function (partialViewResult) {
+                $("#EditPhotoDialog").html(partialViewResult);
+                var createMode = (id == 0);
+                var form = GetForm("#EditPhotoDialog");
+                $.validator.addMethod("ImageUploaderExist", function () { return CheckPhoto(id == 0); }, "Aucune photo!");
+                $.validator.addMethod("ImageUpLoaderSize", function () { return CheckPhotoSize(); }, "Taille excessive!");
+                AppUtilities_BindCallBack();
+                $("#EditPhotoDialog").dialog({
+                    modal: true,
+                    open: function (event, ui) {
+                        $('#EditPhotoDialog').css('overflow-x', 'hidden');
+                    },
+                    resizable: true,
+                    width: 330,
+                    height: 620,
+                    title: (createMode ? 'Ajout de photo' : 'Modification de photo'),
+                    buttons: [
+                        {
+                            text: (createMode ? 'Créer' : 'Modifier'),
+                            class: 'btn-primary',
+                            style: 'width:80px',
+                            click: function () {
+                                if (form.valid()) {
+                                    var data = new FormData(form[0]);
+                                    var files = $("#ImageUploader").get(0).files;
+                                    for (i = 0; i < files.length; i++) {
+                                        data.append("files" + i, files[i]);
+                                    }
+                                    $.ajax({
+                                        type: 'POST',
+                                        url: "@Url.Action("Edit","Photos")",
+                                        data: data,
+                                        contentType: false,
+                                        processData: false,
+                                        success: function (data) {
+                                            if (data.status) {
+                                                GetPhotos();
+                                                if (createMode) {
+                                                    LastPhoto();
+                                                }
+                                                else {
+                                                    UpdatePhoto();
+                                                }
+                                                $("#EditPhotoDialog").dialog('close');
+                                                $("#EditPhotoDialog").html("");
+                                            }
+                                        }
+                                    });
+                                }
+                            }
+                        },
+                        {
+                            text: 'Annuler',
+                            style: 'width:80px',
+                            click: function () {
+                                $("#EditPhotoDialog").dialog('close');
+                                $("#EditPhotoDialog").html("");
+                            }
+                        }
+                    ]
+                })
+            });
+        }
+
+    </script>
+}
+

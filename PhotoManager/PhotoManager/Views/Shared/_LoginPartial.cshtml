@@ -1,0 +1,30 @@
+﻿@if (Session["CurrentUser"] != null)
+{
+    var user = (PhotoManager.Models.User)Session["CurrentUser"];
+    <ul class="nav navbar-nav navbar-right">
+        <li style="color:steelblue">
+            <a href="#" style="text-decoration:none" id="EditAccount">
+                <span class="UserName">@user.GetFullName()</span>
+            </a>
+        </li>
+        <li>
+            <a href="@Url.Action("Logout","Accounts")">Se déconnecter</a>
+        </li>
+    </ul>
+}
+else
+{
+    <ul class="nav navbar-nav navbar-right">
+        <li>
+            <a href="#" style="text-decoration:none" id="CreateAccount">
+                S'inscrire
+            </a>
+        </li>
+        <li>
+            <a href="#" style="text-decoration:none" id="Login">
+                Se connecter
+            </a>
+        </li>
+    </ul>
+}
+

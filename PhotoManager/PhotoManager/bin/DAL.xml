@@ -1,0 +1,387 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>DAL</name>
+    </assembly>
+    <members>
+        <member name="T:DAL.RecordsFile`1">
+            <summary>
+            <para>Author : Nicolas Chourot (all rights reserved)</para>
+            <para></para>
+            <para>This class is dedicated to give access to CRUD queries to a text file organized like the following.</para>
+            <para></para>
+            <para>      Id | field 1 | field 2 | ... | field n</para>
+            <para></para>
+            <para></para>
+            <para>The provided RecordType must be another user class which properties match the text file line fields:</para>
+            <para>public class Record</para>
+            <para>{</para>
+            <para>      public int Id {get; set;}  IMPORTANT: the first member has to be of type int and named Id</para>
+            <para>      public Type Field_name_1 {get; set;}</para>
+            <para>      public Type Field_name_2 {get; set;}</para>
+            <para>      ...</para>
+            <para>      public Type Field_name_n {get; set;}</para>
+            <para>      public Type _Excluded_Member {get; set;}</para>
+            <para></para>
+            <para>      public Record() {} // default constructor</para>
+            <para>}</para>
+            <para>All member identifiers that begin with underscore (_) will be excluded from the strongly typed binding</para>
+            <para>with the fields of the of the target table records.</para>
+            </summary>
+        </member>
+        <member name="M:DAL.RecordsFile`1.#ctor(System.String)">
+            <summary>
+            Basic constructor
+            </summary>
+            <param name="filePath">Text file path</param>
+        </member>
+        <member name="M:DAL.RecordsFile`1.Get(System.Int32)">
+            <summary>
+            Get the record where Id = record.Id
+            </summary>
+            <param name="Id"></param>
+            <returns>Object of RecordType</returns>
+        </member>
+        <member name="M:DAL.RecordsFile`1.ToList">
+            <summary>
+            Get all records
+            </summary>
+            <returns>List of RecordType</returns>
+        </member>
+        <member name="M:DAL.RecordsFile`1.Add(`0)">
+            <summary>
+            Insert a new record
+            </summary>
+            <param name="record"></param>
+            <returns>Id of the newly added record</returns>
+        </member>
+        <member name="M:DAL.RecordsFile`1.Update(`0)">
+            <summary>
+            Update the provided record
+            </summary>
+            <param name="record"></param>
+        </member>
+        <member name="M:DAL.RecordsFile`1.Delete(System.Int32)">
+            <summary>
+            Delete the record where record.Id = Id
+            </summary>
+            <param name="Id"></param>
+        </member>
+        <member name="M:DAL.RecordsFile`1.DeleteAll">
+            <summary>
+            Delete all the records
+            </summary>
+        </member>
+        <member name="M:DAL.RecordsFile`1.GetByField(System.String,System.Object)">
+            <summary>
+            Get all records where record.name = value
+            </summary>
+            <param name="name">Name of the matching field</param>
+            <param name="value">value to be matched</param>
+            <returns>List of RecordType</returns>
+        </member>
+        <member name="M:DAL.RecordsFile`1.DeleteByField(System.String,System.Object)">
+            <summary>
+            Delete all records where record.name = value
+            </summary>
+            <param name="name">Name of the matching field</param>
+            <param name="value">value to be matched</param>
+            <returns></returns>
+        </member>
+        <member name="M:DAL.RecordsFile`1.GetFirstByField(System.String,System.Object)">
+            <summary>
+            Get the first record where record.name = value
+            </summary>
+            <param name="name">Name of the matching field</param>
+            <param name="value">value to be matched</param>
+            <returns>RecordType</returns>
+        </member>
+        <!-- Commentaire XML incorrect pour le membre "M:DAL.RecordsFile`1.GetByPeriod(System.String,System.DateTime,System.DateTime)" -->
+        <member name="T:DAL.SQL_Journal_Item">
+            <summary>
+            Memorize the info of a SQL request log
+            </summary>
+        </member>
+        <member name="T:DAL.SQL_Journal">
+            <summary>
+            Used for handling a SQL requests log text file
+            </summary>
+        </member>
+        <member name="M:DAL.SQL_Journal.#ctor(System.String)">
+            <summary>
+            Basic constructor
+            </summary>
+            <param name="filePath">Text file path</param>
+        </member>
+        <member name="M:DAL.SQL_Journal.Add(System.String,System.String)">
+            <summary>
+            Add a SQL request log
+            </summary>
+            <param name="Method">Name of the member function where the SQL request is executed</param>
+            <param name="Descr">More details</param>
+        </member>
+        <member name="T:DAL.ImageGUIDReference">
+            <summary>
+            Author: Nicolas Chourot (all rights reserved)
+            Give access of CRUD request to image file and automatic naming with a Global Unique Identifier
+            </summary>
+        </member>
+        <member name="P:DAL.ImageGUIDReference.DefaultImage">
+            <summary>
+            Name with file extension (prefered .png) of the default image
+            </summary>
+        </member>
+        <member name="P:DAL.ImageGUIDReference.BasePath">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:DAL.ImageGUIDReference.#ctor(System.String,System.String)">
+            <summary>
+            Basic constructor
+            </summary>
+            <param name="basePath">Folder path of all image files</param>
+            <param name="defaultImage">Default image</param>
+        </member>
+        <member name="M:DAL.ImageGUIDReference.GetURL(System.String)">
+            <summary>
+            provides the URL of the image file
+            </summary>
+            <param name="GUID"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DAL.ImageGUIDReference.UpLoadImage(System.Web.HttpRequestBase,System.String)">
+            <summary>
+            Upload the image data from the HttpRequest to an image file
+            </summary>
+            <param name="Request">The HttpRequest that hold the image BLOB</param>
+            <param name="PreviousGUID">Previous Global Unique Id</param>
+            <returns>Global Unique Id</returns>
+        </member>
+        <member name="M:DAL.ImageGUIDReference.Remove(System.String)">
+            <summary>
+            Remove the image file named GUID.png
+            </summary>
+            <param name="GUID"></param>
+        </member>
+        <member name="T:DAL.DataBase">
+            <summary>
+            Author: Nicolas Chourot (all rights reserved)
+            This class hold the connection string of a data base and an optional SQL requests log journal.
+            It also handle SQL transactions
+            </summary>
+        </member>
+        <member name="P:DAL.DataBase.ConnectionString">
+            <summary>
+            The data base connection string
+            </summary>
+        </member>
+        <member name="P:DAL.DataBase.TrackSQL">
+            <summary>
+            Set to true to keep all SQL requests in the SQL journal otherwise if the SQL_journal is not null with keep track of SQL request errors only
+            </summary>
+        </member>
+        <member name="M:DAL.DataBase.#ctor(System.String,System.String)">
+            <summary>
+            Constructor with connectionString
+            <para>Sql Express V12</para>
+            <para>String BDFI = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename='" + DB_Path + "'; Integrated Security=true;Max Pool Size=1024;Pooling=true;";</para>
+            <para>Sql Express V11</para>
+            <para>String BDFI = @"Data Source=(LocalDB)\v11.0;AttachDbFilename='" + DB_Path + "'; Integrated Security=true;Max Pool Size=1024;Pooling=true;";</para>
+            </summary>
+            <param name="ConnectionString">The data base connection string</param>
+            <param name="SQL_Journal_FilePath">Optinal parameter for the SQL journal file path</param>
+        </member>
+        <member name="M:DAL.DataBase.BeginTransaction(System.String)">
+             <summary>
+             Begin a SQL transaction
+            <para/>Example
+            <para/>bool error = false;
+            <para/>try
+            <para/>{
+            <para/>   dataBaseObj.BeginTransaction("Optional Description");
+            <para/>   // do some sql requests
+            <para/>}
+            <para/>catch(Exception)
+            <para/>{
+            <para/>   error = true;
+            <para/>}
+            <para/>finally
+            <para/>{
+            <para/>   dataBaseObj.EndTransaction(error); // if (error) Rollback... else Commit...
+            <para/>}
+             </summary>
+        </member>
+        <member name="M:DAL.DataBase.EndTransaction(System.Boolean)">
+            <summary>
+            End an SQL transaction. Usage :
+            dataBaseObj.EndTransaction(error); // if (error) Rollback... else Commit...
+            </summary>
+            <param name="error"></param>
+        </member>
+        <member name="T:DAL.RecordsDB`1">
+            <summary>
+            Author: Nicolas Chourot (all rights reserved)
+            This class is dedicated to give access to CRUD queries on a specific target table of a database.
+            <para>It assumed that the first field of the target table if named "Id" of type int IDENTITY(1,1)</para>
+            <para>The derived user class should be named with target table name.</para>
+            <para>The provided type RecordType must be another user class which match the target table record fields:</para>
+            <para>  public class Record</para>
+            <para>  {</para>
+            <para>      public int Id {get; set;}  IMPORTANT: the first member has to be of type int and named Id</para>
+            <para>      public Type Field_name_1 {get; set;}</para>
+            <para>      public Type Field_name_2 {get; set;}</para>
+            <para>      ...</para>
+            <para>      public Type Field_name_n {get; set;}</para>
+            <para></para>
+            <para>      public Record() {} // default constructor</para>
+            <para>  }</para>
+            <para></para>
+            </summary>
+            <typeparam name="RecordType"></typeparam>
+        </member>
+        <member name="M:DAL.RecordsDB`1.#ctor(DAL.DataBase)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="DataBase">DataBase object initialised with the data base connection string</param>
+        </member>
+        <member name="M:DAL.RecordsDB`1.SetCacheSQL(System.String)">
+            <summary>
+            Override the defaut SQL query SELECT * FROM [derived user class name]
+            <para>used to maintain the cache that hold the list of items of type RecordType.</para>
+            </summary>
+            <param name="SQL"></param>
+        </member>
+        <member name="M:DAL.RecordsDB`1.SetCache(System.Boolean,System.String)">
+            <summary>
+            Specify the used of a cache or not
+            </summary>
+            <param name="activate">If true, activate the use of a cache that hold a list of items of type RecordType</param>
+            <param name="SQL">Override the defaut SQL query SELECT * FROM [derived user class name]</param>
+        </member>
+        <member name="M:DAL.RecordsDB`1.ToDictionary(System.String)">
+            <summary>
+            Returns a list of items of type RecordType from the last query to database.
+            <para>The type RecordType is provided at instanciation of derived RecordsDB class.</para>
+            </summary>
+            <param name="orderBy">Optional sql order by clause</param>
+            <returns></returns>
+        </member>
+        <member name="M:DAL.RecordsDB`1.ToList(System.String)">
+            <summary>
+            Returns a list of items of type RecordType from the last query to database.
+            <para>The type RecordType is provided at instanciation of derived RecordsDB class.</para>
+            </summary>
+            <param name="orderBy">Optional sql order by clause</param>
+            <returns></returns>
+        </member>
+        <member name="M:DAL.RecordsDB`1.GetQuerySQL(System.String)">
+            <summary>
+            Return a list of items from of type RecordType from the SQL query to the database.
+            <para>The type RecordType is provided at instanciation of derived RecordsDB class.</para>
+            </summary>
+            <param name="SQL">SQL query</param>
+            <returns>List of objects of type RecordType.</returns>
+        </member>
+        <member name="M:DAL.RecordsDB`1.Get(System.Int32)">
+            <summary>
+            Return a item of type RecordType that correspond to the target table record of id = Id.
+            <para>The type RecordType is provided at instanciation of derived RecordsDB class.</para>
+            </summary>
+            <param name="ID">the desired item of type RecordType where id = Id</param>
+            <returns>Object of type RecordType.</returns>
+        </member>
+        <member name="M:DAL.RecordsDB`1.GetByFieldName(System.String,System.Object)">
+            <summary>
+            Return a list of items of type RecordType where FieldName = value
+            </summary>
+            <param name="FieldName">Target field name</param>
+            <param name="value">Value to be matched</param>
+            <returns></returns>
+        </member>
+        <member name="M:DAL.RecordsDB`1.GetFirstByFieldName(System.String,System.Object)">
+            <summary>
+            Get the first record of type RecordType where FieldName = value
+            </summary>
+            <param name="FieldName"></param>
+            <param name="value"></param>
+            <returns></returns>
+        </member>
+        <member name="M:DAL.RecordsDB`1.GetByPeriod(System.String,System.DateTime,System.DateTime)">
+            <summary>
+            Return a list of items of type RecordType that correspond to the target table records where 
+            <para>DateTimeFieldName &gt;= min and DateTimeFieldName &lt;= max </para>
+            <para>The type RecordType is provided at instanciation of derived RecordsDB class.</para>
+            </summary>
+            <param name="DateTimeFieldName"></param>
+            <param name="min"></param>
+            <param name="max"></param>
+            <returns>list of objects of type RecordType.</returns>
+        </member>
+        <member name="M:DAL.RecordsDB`1.Add(`0)">
+            <summary>
+            Add a new record in the target table using the data from record of type RecordType.
+            <para>The type RecordType is provided at instanciation of derived RecordsDB class.</para>
+            </summary>
+            <param name="record">item of type RecordType.</param>
+            <returns>the Id of the newly added record.</returns>
+        </member>
+        <member name="M:DAL.RecordsDB`1.Update(`0)">
+            <summary>
+            Update a record in the target table using the data from record of type RecordType.
+            </summary>
+            <param name="record">Object of type RecordType.</param>
+        </member>
+        <member name="M:DAL.RecordsDB`1.Delete(System.Int32)">
+            <summary>
+            Delete a record from the target table where id = Id.
+            <para>Override this method if you want to make extra delete treatments.</para>
+            </summary>
+            <param name="ID">The record Id to delete.</param>
+        </member>
+        <member name="M:DAL.RecordsDB`1.DeleteByFieldName(System.String,System.Object)">
+            <summary>
+            Delete records from the target table where fieldName = value.
+            </summary>
+            <param name="fieldName">the target field name of target table</param>
+            <param name="value">a value that must have the same type of the target field type.</param>
+        </member>
+        <member name="F:DAL.RecordsDB`1.cache">
+            Provides the datetime of the last update of cache
+        </member>
+        <member name="M:DAL.RecordsDB`1.GetCache">
+            <summary>
+            Return the list of items of type RecordType issued by the last SQL query stored in the cache.
+            <para>This method is usefull only if the cache is activated.</para>
+            <para>The type RecordType is provided at instanciation of derived RecordsDB class.</para>
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:DAL.RecordsDB`1.NonQuerySQL(System.String)">
+            <summary>
+            Submit a sql command. Must be encapsulated within a transaction otherwise a local transaction will be applied.
+            </summary>
+            <param name="sqlCommandText"></param>
+        </member>
+        <member name="T:DAL.Encryption">
+            <summary>
+            This class is for encryption and decryption of any string
+            </summary>
+        </member>
+        <member name="M:DAL.Encryption.Encrypt(System.String)">
+            <summary>
+            Encrypt a string
+            </summary>
+            <param name="toEncrypt"></param>
+            <returns>encrypted string</returns>
+        </member>
+        <member name="M:DAL.Encryption.Decrypt(System.String)">
+            <summary>
+            Decrypt a string
+            </summary>
+            <param name="toDecrypt"></param>
+            <returns>decrypted string</returns>
+        </member>
+    </members>
+</doc>

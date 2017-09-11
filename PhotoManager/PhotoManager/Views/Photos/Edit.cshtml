@@ -1,0 +1,45 @@
+﻿@model PhotoManager.Models.Photo
+
+@using (Html.BeginForm())
+
+{
+    @Html.AntiForgeryToken()
+    <br/>
+
+    <div class="form-horizontal">
+
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.Id)
+        @Html.HiddenFor(model => model.OwnerId)
+        @Html.HiddenFor(model => model.GUID)
+
+
+        <div class="form-group">
+            <div class="col-md-12">
+                @Html.EditorFor(model => model.Title, new { htmlAttributes = new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Title) } })
+                @Html.ValidationMessageFor(model => model.Title, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-12">
+                @Html.TextAreaFor(model => model.Description, new { @class = "form-control", placeholder = Html.DisplayNameFor(model => model.Description) })
+                @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-12">
+                @Html.EditorFor(model => model.ShootDate, new { htmlAttributes = new { @class = "form-control datepicker" } })
+                @Html.ValidationMessageFor(model => model.ShootDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-10">
+                @Helper.ImageUpLoader(Url, Model.GetPhotoURL(), "Cliquez pour choisir la photo...", "max-width:280px;")
+                @Html.ValidationMessage("ImageUploader", "", new { @class = "text-danger" })
+            </div>
+        </div>
+    </div>
+}
